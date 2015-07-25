@@ -3,6 +3,7 @@
 import csv
 import numpy as np
 from sklearn import svm
+import matplotlib.pyplot as plt
 
 # 0: PassengerId, 1: Survived, 2: Pclass, 3: Name, 4: Sex (male,female), 5: Age, 6: SibSp, 7: ParCh, 8: Ticket, 9: Fare, 10: Cabin, 11: Embarked (S,C,Q)
 # 1,0,3,"Braund, Mr. Owen Harris",male,22,1,0,A/5 21171,7.25,,S
@@ -56,7 +57,7 @@ print "Deceased", len(y) - sum(y)
 testFile = '../data/test_validation.csv'
 XTest, yTest = loadData(testFile, means, stds)
 
-linear_clf = svm.SVC(kernel='linear')
+linear_clf = svm.SVC(kernel='linear', class_weight= 'auto')
 linear_clf.fit(X, y)
 
 yTestPredicted = linear_clf.predict(XTest)
@@ -70,7 +71,23 @@ print "Correctly predicted Test:", sum(yTest == yTestPredicted)
 print "Incorrectly predicted Test:", sum(yTest != yTestPredicted)
 print "Weights:", linear_clf.coef_
 
-rbf_clf = svm.SVC(kernel='rbf')
+f1 = 1
+f2 = 2
+w = linear_clf.coef_[0]
+a = -w[f1] / w[f2]
+xx = np.linspace(-2, 1)
+yy = a * xx - (linear_clf.intercept_[0]) / w[1]
+
+plt.plot(xx, yy, 'k-', label = 'decision boundary')
+
+plt.plot([x[f1] for x,yt in zip(X,y) if yt == 1], [x[f2] for x,yt in zip(X,y) if yt == 1], 'ro', label = 'survived')
+plt.plot([x[f1] for x,yt in zip(X,y) if yt == 0], [x[f2] for x,yt in zip(X,y) if yt == 0], 'bx', label = 'deceased')
+plt.ylim([-5, 5])
+plt.xlabel("Gender")
+plt.ylabel("Age")
+plt.legend()
+
+rbf_clf = svm.SVC(kernel='rbf', class_weight= 'auto')
 rbf_clf.fit(X, y)
 
 yTestPredicted = rbf_clf.predict(XTest)
@@ -83,7 +100,7 @@ print "Incorrectly predicted Train:", sum(y != yTrainPredicted)
 print "Correctly predicted Test:", sum(yTest == yTestPredicted)
 print "Incorrectly predicted Test:", sum(yTest != yTestPredicted)
 
-sigmoid_clf = svm.SVC(kernel='sigmoid')
+sigmoid_clf = svm.SVC(kernel='sigmoid', class_weight= 'auto')
 sigmoid_clf.fit(X, y)
 
 yTestPredicted = sigmoid_clf.predict(XTest)
@@ -96,7 +113,7 @@ print "Incorrectly predicted Train:", sum(y != yTrainPredicted)
 print "Correctly predicted Test:", sum(yTest == yTestPredicted)
 print "Incorrectly predicted Test:", sum(yTest != yTestPredicted)
 
-poly2_clf = svm.SVC(kernel='poly', degree = 2)
+poly2_clf = svm.SVC(kernel='poly', degree = 2, class_weight= 'auto')
 poly2_clf.fit(X, y)
 
 yTestPredicted = poly2_clf.predict(XTest)
@@ -109,7 +126,7 @@ print "Incorrectly predicted Train:", sum(y != yTrainPredicted)
 print "Correctly predicted Test:", sum(yTest == yTestPredicted)
 print "Incorrectly predicted Test:", sum(yTest != yTestPredicted)
 
-poly3_clf = svm.SVC(kernel='poly')
+poly3_clf = svm.SVC(kernel='poly', class_weight= 'auto')
 poly3_clf.fit(X, y)
 
 yTestPredicted = poly3_clf.predict(XTest)
@@ -122,7 +139,7 @@ print "Incorrectly predicted Train:", sum(y != yTrainPredicted)
 print "Correctly predicted Test:", sum(yTest == yTestPredicted)
 print "Incorrectly predicted Test:", sum(yTest != yTestPredicted)
 
-poly5_clf = svm.SVC(kernel='poly', degree = 5)
+poly5_clf = svm.SVC(kernel='poly', degree = 5, class_weight= 'auto')
 poly5_clf.fit(X, y)
 
 yTestPredicted = poly5_clf.predict(XTest)
@@ -134,3 +151,5 @@ print "Correctly predicted Train:", sum(y == yTrainPredicted)
 print "Incorrectly predicted Train:", sum(y != yTrainPredicted)
 print "Correctly predicted Test:", sum(yTest == yTestPredicted)
 print "Incorrectly predicted Test:", sum(yTest != yTestPredicted)
+
+plt.show()
